@@ -1,0 +1,33 @@
+name: Validar Pull Request
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validar origem do Pull Request
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref }}
+          TARGET_BRANCH: ${{ github.base_ref }}
+        run: |
+          echo "Branch de origem: $SOURCE_BRANCH"
+          echo "Branch de destino: $TARGET_BRANCH"
+
+          if [ "$TARGET_BRANCH" = "develop" ]; then
+            echo "Validando versão no ambiente develop"
+            exit 0
+          fi
+
+          if [ "$TARGET_BRANCH" = "staging" ] || [ "$TARGET_BRANCH" = "main" ]; then
+            if [[ "$SOURCE_BRANCH" =~ ^release/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Validando versão no ambiente $TARGET_BRANCH"
+              exit 0
+            else
+              echo "ERRO: a branch de origem deve seguir o formato release/x.x.x.x"
+              exit 1
+            fi
+          fi
