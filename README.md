@@ -1,0 +1,1 @@
+Exemplo de alteração para validação do fluxo de Pull Request.
